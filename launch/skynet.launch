@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="image_topic"       default="/kinect2/qhd/image_color_rect"/>
+  <arg name="checkpoint_file"   default="fyp1106.checkpoint"/>
+  <arg name="use_gpu"           default="true"/>
+
+  <!-- 
+
+
+  <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch" />
+  -->
+
+  <node name="skynet" pkg="emo_buritto" type="inference.py" output="screen" required="true">
+    <param name="image_topic"         value="$(arg image_topic)"/>
+    <param name="checkpoint_file"     value="$(arg checkpoint_file)"/>
+    <param name="use_gpu"             value="$(arg use_gpu)"/>
+  </node>
+
+
+</launch>
