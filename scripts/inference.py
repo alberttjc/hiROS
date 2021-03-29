@@ -5,14 +5,15 @@ import json
 import rospy
 import sys
 import time
-
 from cv_bridge import CvBridge, CvBridgeError
+
+# ROS Messages
 from sensor_msgs.msg import Image
+from HiROS.msg import Gestures
 
 # Dependncies for Sense
 import torch
 import sense.display
-from sense.controller import Controller
 from sense.downstream_tasks.nn_utils import LogisticRegression
 from sense.downstream_tasks.nn_utils import Pipe
 from sense.downstream_tasks.postprocess import PostprocessClassificationOutput
@@ -21,18 +22,12 @@ from sense.loading import load_backbone_model_from_config
 from sense.loading import update_backbone_weights, load_backbone_weights
 from sense.thresholds import GESTURE_THRESHOLDS
 
-# Dependncies to detect package path
-from rospkg import RosPack
-package = RosPack()
-package_path = package.get_path('emo_buritto')
-
-#Dependencies for Snowpiercer
+#Dependencies for HiROS
 from collections import Callable
 from typing import List
 from typing import Optional
 from typing import Union
 
-from sense.camera import VideoStream
 from sense.display import DisplayResults
 from sense.engine import InferenceEngine
 from sense.downstream_tasks.nn_utils import RealtimeNeuralNet
@@ -40,6 +35,11 @@ from sense.downstream_tasks.postprocess import PostProcessor
 from typing import Dict
 import numpy as np
 import cv2
+
+# Dependncies to detect package path
+from rospkg import RosPack
+package = RosPack()
+package_path = package.get_path('HiROS')
 
 # To shutdown
 import signal
@@ -52,7 +52,6 @@ class HiROS():
             self,
             neural_network: RealtimeNeuralNet,
             post_processors: Union[PostProcessor, List[PostProcessor]],
-            #results_display: DisplayResults,
             thresholds: Dict[str, float],
             callbacks: Optional[List[Callable]] = None,
             path_in: str = Optional[None],
@@ -70,28 +69,27 @@ class HiROS():
         self.frame_index = None
         self.clip = None
         self.aspect_ratio = True
-        
 
         # ROS Subscribers
         self.bridge = CvBridge()
         self.pub_image = rospy.Publisher("/HiROS/interface", Image, queue_size=10)
+        self.pub_gesture = rospy.Publisher("/HiROS/gestures", Gestures, queue_size=1)
         self.sub_image = rospy.Subscriber(image_topic, Image, self.run_inference, queue_size=1, buff_size=2**24)
         self._start_inference()
 
         # Display Overlay
         self.thresholds = thresholds
         self._start_time = None
+        self._class_prediction = None
 
 
     def run_inference(self, data):
-        #runtime_error = None
-
         try:
-            frame = self.bridge.imgmsg_to_cv2(data, "rgb8")
+            self.frame = self.bridge.imgmsg_to_cv2(data, "rgb8")
         except CvBridgeError as e:
             rospy.logerr('Converting Image Error. '+ str(e))
 
-        _frame = self.process_image(frame)
+        _frame = self.process_image(self.frame)
         self.frame_index += 1
         self.clip = np.roll(self.clip, -1, 1)
         self.clip[:, -1, :, :, :] = _frame
@@ -99,19 +97,17 @@ class HiROS():
         if self.frame_index == self.inference_engine.step_size:
             # A new clip is ready
             self.inference_engine.put_nowait(self.clip)
-            #print('Working')
         
         self.frame_index = self.frame_index % self.inference_engine.step_size
 
         # Get predictions
         prediction = self.inference_engine.get_nowait()
         prediction_postprocessed = self.postprocess_prediction(prediction)
-        self.display_prediction(frame, prediction_postprocessed)
+        self.display_prediction(self.frame, prediction_postprocessed)
 
         # Apply callbacks
         if not all(callback(prediction_postprocessed) for callback in self.callbacks):
-            print('Error')
-        
+            print('Error')  
     
     def process_image(self, img):
         #self.size = [img.shape[0], img.shape[1]]
@@ -128,7 +124,6 @@ class HiROS():
         # size of the image is (256,256,3)
         return cv2.resize(pad_img, self.size) #if self.size else img
 
-
     def postprocess_prediction(self, prediction):
         post_processed_data = {}
         for post_processor in self.postprocessors:
@@ -138,32 +133,44 @@ class HiROS():
     def display_prediction(self, img: np.ndarray, prediction_postprocessed: dict):
         # Live display
         sorted_predictions = prediction_postprocessed['sorted_predictions']
+
+        # Display Top 1 result from the inference layer
         for index in range(1):
             activity, proba = sorted_predictions[index]
             y_pos = 20* index + 40
-
-        x_offset = 350 + y_pos
-        self.display_overlay(prediction_postprocessed)
+        x_offset = int(self.frame.shape[1]/2 + y_pos)
         cv2.putText(img, 'Activity: {}'.format(activity[0:50]), (10,y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255), 2, cv2.LINE_AA)
         cv2.putText(img, 'Proba: {}'.format("{:.2f}".format(proba)), (10 + x_offset,y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255), 2, cv2.LINE_AA)
 
-        if self._class_prediction is not None:
-            cv2.putText(img, self._class_prediction, (250,300), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255,255,255), 2, cv2.LINE_AA)
+        # Display the Top 1 result after comparing the hard-coded thresholds
+        now = self._get_current_time()
+
+        if self._class_prediction and now - self._start_time < 2.0:
+            textsize = cv2.getTextSize(self._class_prediction, cv2.FONT_HERSHEY_PLAIN, 2.5, 2)[0]
+            w_middle = int((self.frame.shape[1]/2) - textsize[0])
+            h_middle = int((self.frame.shape[0] + textsize[1]) / 2)
+            cv2.putText(img, self._class_prediction, (w_middle,h_middle), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255,255,255), 2, cv2.LINE_AA)
+        else:
+            self._class_prediction = None
+            for class_name, proba in sorted_predictions:
+                if class_name in self.thresholds and proba > self.thresholds[class_name]:
+                    textsize = cv2.getTextSize(self._class_prediction, cv2.FONT_HERSHEY_PLAIN, 2.5, 2)[0]
+                    w_middle = int((self.frame.shape[1]/2) - textsize[0])
+                    h_middle = int((self.frame.shape[0] + textsize[1]) / 2)
+                    cv2.putText(img, self._class_prediction, (w_middle,h_middle), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255,255,255), 2, cv2.LINE_AA)
+                    self._class_prediction = class_name
+                    self._start_time = now
+
+                    # Message 
+                    gesture = Gestures()
+                    gesture.action = class_name
+                    gesture.action_index = class2int[class_name]
+                    gesture.prob = proba
+                    self.pub_gesture.publish(gesture)
+                    break
 
         image_msg = self.bridge.cv2_to_imgmsg(img, "rgb8")
         self.pub_image.publish(image_msg)
-
-    def display_overlay(self, prediction: dict):
-
-        now = self._get_current_time()
-
-        #if self._class_prediction and now - self._start_time < 2.0:
-        #    print(1)
-        self._class_prediction = None
-        for class_name, proba in prediction['sorted_predictions']:
-            if class_name in self.thresholds and proba > self.thresholds[class_name]:
-                self._class_prediction = class_name
-
 
     @staticmethod
     def _get_current_time() -> float:
@@ -172,7 +179,6 @@ class HiROS():
         Extracted for ease of testing.
         """
         return time.perf_counter()
-
 
 
     def _start_inference(self):
@@ -190,8 +196,6 @@ class HiROS():
     def _stop_inference(self):
         rospy.loginfo("Stopping inference")
         self.inference_engine.stop()
-
-
 
 
 if __name__ == '__main__':
@@ -251,26 +255,13 @@ if __name__ == '__main__':
         PostprocessClassificationOutput(INT2LAB, smoothing=4)
     ]
 
-    border_size = 30
-    """
-    display_ops = [
-        sense.display.DisplayFPS(expected_camera_fps=net.fps,
-                                    expected_inference_fps=net.fps / net.step_size),
-        sense.display.DisplayTopKClassificationOutputs(top_k=1, threshold=0.1),
-        sense.display.DisplayClassnameOverlay(thresholds=GESTURE_THRESHOLDS,
-                                                border_size=border_size if not title else border_size + 50),
-    ]
-    display_results = sense.display.DisplayResults(title=title, display_ops=display_ops)
-    """
     main = HiROS(
         neural_network=net,
         post_processors=postprocessor,
-        #results_display=display_results,
         thresholds=GESTURE_THRESHOLDS,
         callbacks=[],
         use_gpu=use_gpu
     )
-
 
     rospy.spin()
 

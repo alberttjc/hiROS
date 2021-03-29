@@ -6,12 +6,10 @@
   <arg name="use_gpu"           default="true"/>
 
   <!-- 
-
-
   <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch" />
   -->
 
-  <node name="skynet" pkg="emo_buritto" type="inference.py" output="screen" required="true">
+  <node name="skynet" pkg="HiROS" type="inference.py" output="screen" required="true">
     <param name="image_topic"         value="$(arg image_topic)"/>
     <param name="checkpoint_file"     value="$(arg checkpoint_file)"/>
     <param name="use_gpu"             value="$(arg use_gpu)"/>

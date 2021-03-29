@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(emo_buritto)
+project(HiROS)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_definitions(-std=c++11)
@@ -22,13 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  BodyPartElm.msg
-  Person.msg
-  Persons.msg
-  BoundingBox.msg
-  OpenPoseHuman.msg
-  PointWithProb.msg
-  OpenPoseHumanList.msg
+  Gestures.msg
 )
 
 ## Generate added messages and services with any dependencies listed here
@@ -49,7 +43,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES beginner_tutorials
-   CATKIN_DEPENDS rospy message_generation message_runtime
+   CATKIN_DEPENDS rospy std_msgs message_runtime
 #  DEPENDS system_lib
 )
 
@@ -64,4 +58,14 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-install()
+#############
+## Install ##
+#############
+
+catkin_install_python(PROGRAMS
+  scripts/inference.py
+  scripts/listener.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
+
+#install()
