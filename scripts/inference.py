@@ -9,7 +9,8 @@ from cv_bridge import CvBridge, CvBridgeError
 
 # ROS Messages
 from sensor_msgs.msg import Image
-from HiROS.msg import Gestures
+from std_msgs.msg import String, Float64, Int16
+from hiROS.msg import Gestures
 
 # Dependncies for Sense
 import torch
@@ -39,7 +40,7 @@ import cv2
 # Dependncies to detect package path
 from rospkg import RosPack
 package = RosPack()
-package_path = package.get_path('HiROS')
+package_path = package.get_path('hiROS')
 
 # To shutdown
 import signal
@@ -47,7 +48,7 @@ def sigint_handler(sig, frame):
     main._stop_inference()
     exit(0)
 
-class HiROS():
+class hiROS():
     def __init__(
             self,
             neural_network: RealtimeNeuralNet,
@@ -72,8 +73,8 @@ class HiROS():
 
         # ROS Subscribers
         self.bridge = CvBridge()
-        self.pub_image = rospy.Publisher("/HiROS/interface", Image, queue_size=10)
-        self.pub_gesture = rospy.Publisher("/HiROS/gestures", Gestures, queue_size=1)
+        self.pub_image = rospy.Publisher("/hiROS/interface", Image, queue_size=10)
+        self.pub_gestures = rospy.Publisher("/hiROS/gestures", Gestures, queue_size=1)
         self.sub_image = rospy.Subscriber(image_topic, Image, self.run_inference, queue_size=1, buff_size=2**24)
         self._start_inference()
 
@@ -166,7 +167,7 @@ class HiROS():
                     gesture.action = class_name
                     gesture.action_index = class2int[class_name]
                     gesture.prob = proba
-                    self.pub_gesture.publish(gesture)
+                    self.pub_gestures.publish(gesture)
                     break
 
         image_msg = self.bridge.cv2_to_imgmsg(img, "rgb8")
@@ -204,8 +205,8 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, sigint_handler)
 
     # Initialise node 
-    rospy.loginfo('Initialise H.i.R.O.S node (Human interaction Robot Operating System')
-    rospy.init_node('HiROS', anonymous=True)
+    rospy.loginfo('Initialise h.i.R.O.S node (human interaction Robot Operating System')
+    rospy.init_node('hiROS', anonymous=True)
     rospy.loginfo(package_path)
 
     # Initialise parameters 
@@ -255,7 +256,7 @@ if __name__ == '__main__':
         PostprocessClassificationOutput(INT2LAB, smoothing=4)
     ]
 
-    main = HiROS(
+    main = hiROS(
         neural_network=net,
         post_processors=postprocessor,
         thresholds=GESTURE_THRESHOLDS,

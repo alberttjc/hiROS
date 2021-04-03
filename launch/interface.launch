@@ -1,15 +1,13 @@
 <?xml version="1.0"?>
 <launch>
 
+  <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch" />
+
   <arg name="image_topic"       default="/kinect2/qhd/image_color_rect"/>
   <arg name="checkpoint_file"   default="fyp1106.checkpoint"/>
-  <arg name="use_gpu"           default="true"/>
+  <arg name="use_gpu"           default="true"/> 
 
-  <!-- 
-  <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch" />
-  -->
-
-  <node name="skynet" pkg="HiROS" type="inference.py" output="screen" required="true">
+  <node name="skynet" pkg="hiROS" type="inference.py" output="screen" required="true">
     <param name="image_topic"         value="$(arg image_topic)"/>
     <param name="checkpoint_file"     value="$(arg checkpoint_file)"/>
     <param name="use_gpu"             value="$(arg use_gpu)"/>
