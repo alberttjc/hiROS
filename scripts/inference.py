@@ -206,7 +206,7 @@ if __name__ == '__main__':
     # Initialise node 
     rospy.loginfo('Initialise h.i.R.O.S node (human interaction Robot Operating System')
     rospy.init_node('hiROS', anonymous=True)
-    rospy.loginfo(package_path)
+    #rospy.loginfo(package_path)
 
     # Initialise parameters 
     image_topic     =   rospy.get_param('~image_topic',     '/kinect2/qhd/image_color_rect')
