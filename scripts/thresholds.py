@@ -51,35 +51,3 @@ GESTURE_THRESHOLDS = {
     "Speed up": 0.5, 
     "Stop": 0.8
 }
-
-"""
-GESTURE_THRESHOLDS = {
-    "Start": .7,
-    "Stop": .4,
-    "Handwave": .6,
-    "Pointing: Object": .5,
-    "Do Nothing": 0,
-    "Come forward": 22,
-    "Doing something else": 26,
-    "Follow me": 12,
-    "Give an Item": 7,
-    "I will follow you": 11,
-    "Move backward": 25,
-    "Move to the left": 24,
-    "Move to the right": 23,
-    "No: Head shake": 21,
-    "Pause": 14,
-    "Pointing: Area": 5,
-    "Receive an Item": 6,
-    "Repeat: Rotate arm clockwise": 8,
-    "Resume": 13,
-    "Slow down": 17,
-    "Speed up": 16,
-    "Thumbs down": 19,
-    "Thumbs up": 18,
-    "Undo: Rotate arm anti-clockwise": 9,
-    "Watch me": 10,
-    "Watch out": 15,
-    "Yes: Head nod": 20,    
-}
-"""

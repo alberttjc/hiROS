@@ -9,7 +9,6 @@ from cv_bridge import CvBridge, CvBridgeError
 
 # ROS Messages
 from sensor_msgs.msg import Image
-from std_msgs.msg import String, Float64, Int16
 from hiROS.msg import Gestures
 
 # Dependncies for Sense
@@ -21,7 +20,7 @@ from sense.downstream_tasks.postprocess import PostprocessClassificationOutput
 from sense.loading import build_backbone_network
 from sense.loading import load_backbone_model_from_config
 from sense.loading import update_backbone_weights, load_backbone_weights
-from sense.thresholds import GESTURE_THRESHOLDS
+from thresholds import GESTURE_THRESHOLDS, LAB2INT
 
 #Dependencies for HiROS
 from collections import Callable
@@ -165,7 +164,7 @@ class hiROS():
                     # Message 
                     gesture = Gestures()
                     gesture.action = class_name
-                    gesture.action_index = class2int[class_name]
+                    gesture.action_index = LAB2INT[class_name]
                     gesture.prob = proba
                     self.pub_gestures.publish(gesture)
                     break
@@ -240,9 +239,13 @@ if __name__ == '__main__':
     # Create backbone network
     backbone_network = build_backbone_network(backbone_model_config, backbone_weights)
 
+    """
     with open(os.path.join(models_dir, 'label2int.json')) as file:
         class2int = json.load(file)
     INT2LAB = {value: key for key, value in class2int.items()}
+    """
+    INT2LAB = {value: key for key, value in LAB2INT.items()}
+
 
     gesture_classifier = LogisticRegression(num_in=backbone_network.feature_dim,
                                             num_out=len(INT2LAB))
