@@ -11,24 +11,43 @@ The custom dataset used to train this repo uses communicative body and hand gest
 - [sense](https://github.com/TwentyBN/sense)
 - Python 3
 
-## Environment
-Before we are able to execute anything, ensure that this repo is in the right environment. Since ROS only uses Python2.7, you need to install Python3 in order to run this repo. Otherwise, you can use install a virtual environemtn of Python3
+
+## Usage
+
+To use this repository, you need to build [opencv_vision](https://github.com/ros-perception/vision_opencv) in Python3 and extend your main workspace (i.e. catkin_ws). More details can be found [here](#Setup)
+
+First, you need to set up the environment.
 
 ```
-$ source py36env/bin/activate
+# In this example, the package was built in ~/build_ws/
+# In your main workspace (i.e. catkin_ws), you need to extend the environment
+$ cd ~/catkin_ws/
+$ catkin_make
+$ source devel/setup.bash
+$ source ~/build_ws/devel/setup.bash --extend
 ```
 
-If you are using ROS to run this repo, remember to build [opencv_vision](https://github.com/ros-perception/vision_opencv) in Python3 and import the **build** and **devel** files and merge it into your main workspace (i.e. catkin_ws).
-
-## Tools
-
-To run this gesture recognition inference, use the following command below. Run <kbd> rqt </kbd> to view the result
+Then, you can run the inference layer. Run <kbd> rqt </kbd> to view the result.
 
 ```
-$ roslaunch hiROS inference.launch
+# kinect = true (if you are using kinect)
+# camera = 0 (change camera id if you have multiple cameras)
 
-or
+$ roslaunch hiROS interface.launch kinect:=false camera:=0
+```
 
-# If you are using a kinect2_bridge 
-$ roslaunch hiROS interface.launch 
+## Setup
+
+
+Once you have installed all the right dependancies for [opencv_vision](https://github.com/ros-perception/vision_opencv), you have to build your workspace. More details can be found from this [site](https://medium.com/@beta_b0t/how-to-setup-ros-with-python-3-44a69ca36674) for reference.
+
+```
+$ mkdir -p ~/build_ws/src
+$ cd ~/build_ws/src
+$ git clone -b melodic https://github.com/ros-perception/vision_opencv.git
+$ cd ~/build_ws
+$ catkin build cv_bridge
+
+# Once you build it, you will need to extend it into your working environment 
+$ source install/setup.bash --extend
 ```
