@@ -25,7 +25,7 @@
 
   <!-- This section of the launch file relates to the inference engine of the gesture recognition -->
 
-  <arg name="checkpoint_file"   default="fyp1106.checkpoint"/>
+  <arg name="checkpoint_file"   default="fyp3013-v2.checkpoint"/>
   <arg name="use_gpu"           default="true"/>
 
 

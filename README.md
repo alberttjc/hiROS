@@ -33,7 +33,33 @@ Then, you can run the inference layer. Run <kbd> rqt </kbd> to view the result.
 # kinect = true (if you are using kinect)
 # camera = 0 (change camera id if you have multiple cameras)
 
+$ roslaunch hiROS inference.launch
 $ roslaunch hiROS interface.launch kinect:=false camera:=0
+
+# To just use the camera, you can run this two launch files
+$ roslaunch video_stream_opencv webcam.launch
+$ roslaunch video_stream_opencv camera.launch
+```
+
+To work on the Fetch robot, you need to enable SSH to communicate with it. In this case, the master should be the Fetch and the Follower should be your device.
+
+```
+# On personal device, run
+$ export ROS_MASTER_URI=http://[Fetch robot IP]:11311/
+$ export ROS_IP=[personal device IP]
+```
+
+For my project, I used these commands below:
+```
+# On personal device
+$ export ROS_MASTER_URI=http://160.69.69.80:11311/
+$ export ROS_IP=160.69.69.129
+$ roslaunch hiROS interface.launch kinect:=false camera:=0
+
+# On Fetch
+$ ssh hrigroup@160.69.69.80
+$ roslaunch hiros_smach robot.launch
+$ rosrun hiros_smach main.py
 ```
 
 ## Setup
@@ -48,6 +74,6 @@ $ git clone -b melodic https://github.com/ros-perception/vision_opencv.git
 $ cd ~/build_ws
 $ catkin build cv_bridge
 
-# Once you build it, you will need to extend it into your working environment 
+# Once you build it, you will need to extend it into your main working environment 
 $ source install/setup.bash --extend
 ```
