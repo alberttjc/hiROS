@@ -1,10 +1,24 @@
-# hiROS 
+# hiROS
+<!-- TABLE OF CONTENTS -->
+<p align="center">
+    <a href=#introduction> Introduction </a> •
+    <a href=#dependencies> Dependencies </a> •
+    <a href=#gestures> Gestures </a> •
+    <a href=#setup> Setup </a> •
+    <a href=#usage> Usage </a>
+</p>
+
+----
 
 ## Introduction
 
-hiROS (Human Interaction Robot Operating System) is a repo constructed using ROS Melodic (Robot Operating System) and [sense](https://github.com/TwentyBN/sense) as the main backbone of this repo.
+hiROS (Human Interaction Robot Operating System) is a repository constructed using ROS Melodic (Robot Operating System) framework and [sense](https://github.com/TwentyBN/sense) as the main backbone.
 
-The custom dataset used to train this repo uses communicative body and hand gestures, with the aim to improve human-robot interaction. Based on current literature, there is no standardised set of gestures used for human-robot interaction and this repo aims to address it.
+Based on current literature, there is no standardised set of gestures used for human-robot interaction. 
+Hence, this projects aims to address this issue by compiling a set of communicative body and hand gestures, with the aim of creating a standardised list for future research in this space.
+The goal is to utilise this custom dataset to train a gesture recognition model to improve current and future research in human-robot interaction.
+More details abot the gestures can be found [here](#gestures).
+
 
 ## Dependencies
 - ROS Melodic
@@ -12,28 +26,54 @@ The custom dataset used to train this repo uses communicative body and hand gest
 - Python 3
 
 
-## Usage
+## Gestures
 
-To use this repository, you need to build [opencv_vision](https://github.com/ros-perception/vision_opencv) in Python3 and extend your main workspace (i.e. catkin_ws). More details can be found [here](#Setup)
+After reviewing current literature, we have compiled a list of gestures to be used for this project.
+To validate our model, we decided to use [sense](https://github.com/TwentyBN/sense) as the main backbone of our project.
+To leverage this gesture recognition model, we conducted a data collection study to collect a more diversifed dataset to train a custom model.
 
-First, you need to set up the environment.
+<p align="center">
+    <img src="docs/gesture_1.gif" width="400px">
+    <img src="docs/gesture_24.gif" width="400px">
+</p>
+
+*(The full list of gestures can be found [here](https://youtube.com/playlist?list=PL-MdrmgE0ZdsBIVYdPruDXcg29n1nCLXA))*
+
+
+## Setup
+
+Since this repository is built in Python3 and ROS Melodic uses Python2.7, you need to first build [opencv_vision](https://github.com/ros-perception/vision_opencv) in Python3 and extend your main workspace (i.e. catkin_ws).
+
+
+Once you have installed all the right dependancies for [opencv_vision](https://github.com/ros-perception/vision_opencv), you have to build your workspace. 
+More details can be found from this [site](https://medium.com/@beta_b0t/how-to-setup-ros-with-python-3-44a69ca36674) for reference.
 
 ```
-# In this example, the package was built in ~/build_ws/
-# In your main workspace (i.e. catkin_ws), you need to extend the environment
-$ cd ~/catkin_ws/
+$ mkdir -p ~/build_ws/src
+$ cd ~/build_ws/src
+$ git clone -b melodic https://github.com/ros-perception/vision_opencv.git
+$ cd ~/build_ws
+$ catkin build cv_bridge
+
+# Once you build it, you will need to extend it into your main working environment (in this example it is catkin_ws)
+# You will need to do this every time you rebuild your workspace
+$ cd ~/catkin_ws
 $ catkin_make
 $ source devel/setup.bash
 $ source ~/build_ws/devel/setup.bash --extend
 ```
 
-Then, you can run the inference layer. Run <kbd> rqt </kbd> to view the result.
+## Usage
+
+Once you have setup your environment, as shown from [setup](#setup), you can run the inference layer. Run <kbd> rqt </kbd> to view the result. 
 
 ```
+# To just run the inference layer
+$ roslaunch hiROS inference.launch
+
+# To run the inference layer with [video_stream_opencv]() package
 # kinect = true (if you are using kinect)
 # camera = 0 (change camera id if you have multiple cameras)
-
-$ roslaunch hiROS inference.launch
 $ roslaunch hiROS interface.launch kinect:=false camera:=0
 
 # To just use the camera, you can run this two launch files
@@ -60,20 +100,4 @@ $ roslaunch hiROS interface.launch kinect:=false camera:=0
 $ ssh hrigroup@160.69.69.80
 $ roslaunch hiros_smach robot.launch
 $ rosrun hiros_smach main.py
-```
-
-## Setup
-
-
-Once you have installed all the right dependancies for [opencv_vision](https://github.com/ros-perception/vision_opencv), you have to build your workspace. More details can be found from this [site](https://medium.com/@beta_b0t/how-to-setup-ros-with-python-3-44a69ca36674) for reference.
-
-```
-$ mkdir -p ~/build_ws/src
-$ cd ~/build_ws/src
-$ git clone -b melodic https://github.com/ros-perception/vision_opencv.git
-$ cd ~/build_ws
-$ catkin build cv_bridge
-
-# Once you build it, you will need to extend it into your main working environment 
-$ source install/setup.bash --extend
 ```
