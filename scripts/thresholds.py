@@ -40,14 +40,12 @@ LAB2INT = {
   "Pointing: Object": 8,
   "Repeat: Rotate arm clockwise": 9,
   "Resume": 10,
-  "Slow down": 11,
-  "Speed up": 12,
-  "Start": 13,
-  "Stop": 14,
-  "Thumbs down": 15,
-  "Thumbs up": 16,
-  "Undo: Rotate arm anti-clockwise": 17,
-  "Watch out": 18
+  "Start": 11,
+  "Stop": 12,
+  "Thumbs down": 13,
+  "Thumbs up": 14,
+  "Undo: Rotate arm anti-clockwise": 15,
+  "Watch out": 16
 }
 
 """
@@ -81,21 +79,19 @@ GESTURE_THRESHOLDS = {
 """
 
 GESTURE_THRESHOLDS = {
-    "Pause": 0.4,
-    "Move to the left": 0.5,
-    "Undo: Rotate arm anti-clockwise": 0.2, 
-    "Thumbs down": 0.5,  
-    "Watch out": 0.3, 
-    "Slow down": 0.7, 
-    "Thumbs up": 0.7, 
-    "Resume": 0.5, 
-    "Repeat: Rotate arm clockwise": 0.2, 
-    "Come forward": 0.4, 
-    "Move to the right": 0.5, 
-    "Move backward": 0.5, 
-    "Handwave": 0.5, 
+    "Pause": 0.6,
+    "Move to the left": 0.6,
+    "Undo: Rotate arm anti-clockwise": 0.3, 
+    "Thumbs down": 0.6,  
+    "Watch out": 0.5, 
+    "Thumbs up": 0.9, 
+    "Resume": 0.7, 
+    "Repeat: Rotate arm clockwise": 0.3, 
+    "Come forward": 0.5, 
+    "Move to the right": 0.6, 
+    "Move backward": 0.8, 
+    "Handwave": 0.4, 
     "Start": 0.5, 
     "Pointing: Object": 0.5, 
-    "Speed up": 0.7, 
-    "Stop": 0.85
+    "Stop": 0.95
 }

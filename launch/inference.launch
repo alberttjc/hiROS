@@ -2,13 +2,17 @@
 <launch>
 
   <arg name="image_topic"       default="/kinect2/qhd/image_color_rect"/>
-  <arg name="checkpoint_file"   default="fyp1106.checkpoint"/>
+  <arg name="checkpoint_file"   default="fyp5024.checkpoint"/>
   <arg name="use_gpu"           default="true"/> 
+  <arg name="human_detection"   default="true"/> 
+  <arg name="debug_inference"   default="false"/> 
 
   <node name="hiROS" pkg="hiROS" type="inference.py" output="screen" required="true">
     <param name="image_topic"         value="$(arg image_topic)"/>
     <param name="checkpoint_file"     value="$(arg checkpoint_file)"/>
     <param name="use_gpu"             value="$(arg use_gpu)"/>
+    <param name="human_detection"     value="$(arg human_detection)"/>
+    <param name="debug_inference"     value="$(arg debug_inference)"/>
   </node>
 
 

@@ -36,7 +36,10 @@ from typing import Dict
 import numpy as np
 import cv2
 
-# Dependncies to detect package path
+# Dependency for Darnet_ros 
+from darknet_ros_msgs.msg import BoundingBoxes
+
+# Dependency to detect package path
 from rospkg import RosPack
 package = RosPack()
 package_path = package.get_path('hiROS')
@@ -81,7 +84,7 @@ class hiROS():
         self.thresholds = thresholds
         self._start_time = None
         self._class_prediction = None
-
+        self.human_detected = None
 
     def run_inference(self, data):
         try:
@@ -100,10 +103,36 @@ class hiROS():
         
         self.frame_index = self.frame_index % self.inference_engine.step_size
 
+        # Get human detection
+        if human_detection == True:
+            self.object_detection = rospy.wait_for_message('/darknet_ros/bounding_boxes', BoundingBoxes)
+            boxes = self.object_detection.bounding_boxes
+            self.human_detected = False
+
+            for box in boxes:
+                if box.id == 0:
+                    self.human_detected = True
+            
+            
+        
         # Get predictions
         prediction = self.inference_engine.get_nowait()
-        prediction_postprocessed = self.postprocess_prediction(prediction)
-        self.display_prediction(self.frame, prediction_postprocessed)
+
+        # If human is detected or human detection is disabled, it will run 
+        # the gesture recognition model
+        # Otherwise it will feed the base input as the output
+        if human_detection == False or self.human_detected == True:
+            prediction_postprocessed = self.postprocess_prediction(prediction)
+            image = self.display_prediction(self.frame, prediction_postprocessed)
+            image_msg = self.bridge.cv2_to_imgmsg(image, "rgb8")
+        else:
+            textsize = cv2.getTextSize("No Human Detected", cv2.FONT_HERSHEY_PLAIN, 2.5, 2)[0]
+            w_middle = int((self.frame.shape[1]/2) - textsize[0])
+            h_middle = int((self.frame.shape[0] + textsize[1]) / 2)
+            cv2.putText(self.frame, "No Human Detected", (w_middle,h_middle), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255,255,255), 2, cv2.LINE_AA)
+            image_msg = self.bridge.cv2_to_imgmsg(self.frame, "rgb8")
+
+        self.pub_image.publish(image_msg)
 
         # Apply callbacks
         if not all(callback(prediction_postprocessed) for callback in self.callbacks):
@@ -114,6 +143,7 @@ class hiROS():
         self.size = (self.inference_engine.expected_frame_size[0],
             self.inference_engine.expected_frame_size[1],)
         #print(self.size)
+        #print(self.inference_engine.step_size)
         if self.aspect_ratio:
             square_size = max(img.shape[0:2])
             pad_top = int((square_size - img.shape[0]) / 2)
@@ -135,17 +165,18 @@ class hiROS():
         sorted_predictions = prediction_postprocessed['sorted_predictions']
 
         # Display Top 1 result from the inference layer
-        for index in range(1):
-            activity, proba = sorted_predictions[index]
-            y_pos = 20* index + 40
-        x_offset = int(self.frame.shape[1]/2 + y_pos)
-        cv2.putText(img, 'Activity: {}'.format(activity[0:50]), (10,y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255), 2, cv2.LINE_AA)
-        cv2.putText(img, 'Proba: {}'.format("{:.2f}".format(proba)), (10 + x_offset,y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255), 2, cv2.LINE_AA)
+        if debug_inference == 'true':
+            for index in range(1):
+                activity, proba = sorted_predictions[index]
+                y_pos = 20* index + 40
+            x_offset = int(self.frame.shape[1]/2 + y_pos)
+            cv2.putText(img, 'Activity: {}'.format(activity[0:50]), (10,y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255), 2, cv2.LINE_AA)
+            cv2.putText(img, 'Proba: {}'.format("{:.2f}".format(proba)), (10 + x_offset,y_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255), 2, cv2.LINE_AA)
 
         # Display the Top 1 result after comparing the hard-coded thresholds
         now = self._get_current_time()
 
-        if self._class_prediction and now - self._start_time < 2.0:
+        if self._class_prediction and now - self._start_time < 3.0:
             textsize = cv2.getTextSize(self._class_prediction, cv2.FONT_HERSHEY_PLAIN, 2.5, 2)[0]
             w_middle = int((self.frame.shape[1]/2) - textsize[0])
             h_middle = int((self.frame.shape[0] + textsize[1]) / 2)
@@ -168,9 +199,10 @@ class hiROS():
                     gesture.prob = proba
                     self.pub_gestures.publish(gesture)
                     break
-
-        image_msg = self.bridge.cv2_to_imgmsg(img, "rgb8")
-        self.pub_image.publish(image_msg)
+            
+        return img
+        #image_msg = self.bridge.cv2_to_imgmsg(img, "rgb8")
+        #self.pub_image.publish(image_msg)
 
     @staticmethod
     def _get_current_time() -> float:
@@ -206,6 +238,7 @@ if __name__ == '__main__':
     # Initialise node 
     rospy.loginfo('Initialise h.i.R.O.S node (human interaction Robot Operating System')
     rospy.init_node('hiROS', anonymous=True)
+    # Debugging purposes
     #rospy.loginfo(package_path)
 
     # Initialise parameters 
@@ -215,6 +248,10 @@ if __name__ == '__main__':
     thresholds_fn   =   rospy.get_param('~thresholds',      'thresholds.py')
     use_gpu         =   rospy.get_param('~use_gpu',         'true')
     title           =   rospy.get_param('~title,',           None)
+
+    # Optional changes
+    human_detection =   rospy.get_param('~human_detection',  None)
+    debug_inference =   rospy.get_param('~debug_inference',  None)
 
     if not image_topic:
         rospy.logerr('Parameter \'camera\' is not provided')
@@ -239,11 +276,7 @@ if __name__ == '__main__':
     # Create backbone network
     backbone_network = build_backbone_network(backbone_model_config, backbone_weights)
 
-    """
-    with open(os.path.join(models_dir, 'label2int.json')) as file:
-        class2int = json.load(file)
-    INT2LAB = {value: key for key, value in class2int.items()}
-    """
+    # Used for labels for each gesture class, stored in thresholds.py file
     INT2LAB = {value: key for key, value in LAB2INT.items()}
 
 

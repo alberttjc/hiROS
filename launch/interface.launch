@@ -11,6 +11,8 @@
   <arg name="camera"          default="0"/>
   <arg name="image_topic"     default="/kinect2/qhd/image_color_rect"  if="$(arg kinect)"/>
   <arg name="image_topic"     value="/webcam/image_raw"                unless="$(arg kinect)"/>
+  <arg name="human_detection"   default="false"/> 
+  <arg name="debug_inference"   default="true"/> 
 
   <group if="$(arg kinect)">
     <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch" />
@@ -25,7 +27,7 @@
 
   <!-- This section of the launch file relates to the inference engine of the gesture recognition -->
 
-  <arg name="checkpoint_file"   default="fyp3013-v2.checkpoint"/>
+  <arg name="checkpoint_file"   default="fyp5024.checkpoint"/>
   <arg name="use_gpu"           default="true"/>
 
 
@@ -33,6 +35,8 @@
     <param name="image_topic"         value="$(arg image_topic)"/>
     <param name="checkpoint_file"     value="$(arg checkpoint_file)"/>
     <param name="use_gpu"             value="$(arg use_gpu)"/>
+    <param name="human_detection"     value="$(arg human_detection)"/>
+    <param name="debug_inference"     value="$(arg debug_inference)"/>
   </node>
 
 
