@@ -53,7 +53,7 @@ This repository was constructed using ROS Melodic (Robot Operating System) frame
 
 ## Setup
 
-### Python3 for ROS Melodic
+### **Python3 for ROS Melodic**
 
 Since this repository is built in Python3 and ROS Melodic uses Python2.7, you need to first build [opencv_vision](https://github.com/ros-perception/vision_opencv) in Python3 and extend your main workspace (i.e. catkin_ws).
 
@@ -78,7 +78,7 @@ $ source devel/setup.bash
 $ source ~/build_ws/devel/setup.bash --extend
 ```
 
-### Gesture Recognition Model (Sense)
+### **Gesture Recognition Model (Sense)**
 
 Before you can use it, pleaes check out the gesture recognition system [here](https://github.com/alberttjc/sense).
 
@@ -104,12 +104,12 @@ $ roslaunch video_stream_opencv webcam.launch
 $ roslaunch video_stream_opencv camera.launch
 ```
 
-### Thresholds
+### **Thresholds**
 
 You can change the thresholds from each gesture used in this file <kbd> scripts/thresholds.py </kbd>.
 
 
-### Opearting with a Fetch robot
+### **Opearting with a Fetch robot**
 
 To work on the Fetch robot, you need to enable SSH to communicate with it. In this case, the master should be the Fetch and the Follower should be your device.
 
