@@ -3,8 +3,9 @@
 <!-- TABLE OF CONTENTS -->
 <p align="center">
     <a href=#introduction> Introduction </a> •
-    <a href=#dependencies> Dependencies </a> •
     <a href=#gestures> Gestures </a> •
+    <a href=#hiros> hiROS </a> •
+    <a href=#dependencies> Dependencies </a> •
     <a href=#setup> Setup </a> •
     <a href=#usage> Usage </a>
 </p>
@@ -77,11 +78,17 @@ $ source devel/setup.bash
 $ source ~/build_ws/devel/setup.bash --extend
 ```
 
+### Gesture Recognition Model (Sense)
+
+Before you can use it, pleaes check out the gesture recognition system [here](https://github.com/alberttjc/sense).
+
 
 
 ## Usage
 
-Once you have setup your environment, as shown from [setup](#setup), you can run the inference layer. Run <kbd> rqt </kbd> to view the result. 
+Once you have setup your environment, as shown from [setup](#setup), you can run the inference layer.
+
+Run <kbd> rqt </kbd> to view the result. 
 
 ```
 # To just run the inference layer
@@ -96,6 +103,13 @@ $ roslaunch hiROS interface.launch kinect:=false camera:=0
 $ roslaunch video_stream_opencv webcam.launch
 $ roslaunch video_stream_opencv camera.launch
 ```
+
+### Thresholds
+
+You can change the thresholds from each gesture used in this file <kbd> scripts/thresholds.py </kbd>.
+
+
+### Opearting with a Fetch robot
 
 To work on the Fetch robot, you need to enable SSH to communicate with it. In this case, the master should be the Fetch and the Follower should be your device.
 
@@ -117,3 +131,4 @@ $ ssh hrigroup@160.69.69.80
 $ roslaunch hiros_smach robot.launch
 $ rosrun hiros_smach main.py
 ```
+
