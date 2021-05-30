@@ -1,4 +1,5 @@
-# hiROS
+# ECSE Final Year Project 2021
+
 <!-- TABLE OF CONTENTS -->
 <p align="center">
     <a href=#introduction> Introduction </a> •
@@ -8,23 +9,23 @@
     <a href=#usage> Usage </a>
 </p>
 
-----
+---
 
 ## Introduction
 
-hiROS (Human Interaction Robot Operating System) is a repository constructed using ROS Melodic (Robot Operating System) framework and [sense](https://github.com/TwentyBN/sense) as the main backbone.
+This repository integrates a gesture recognition system into the ROS framework to further facilitate human robot interaction research. Based on current literature, there is no standardised set of gestures used for human robot interaction. Hence, this projects aims to address this issue by compiling a set of communicative body and hand gestures, with the aim of creating a standardised list for future research in this space.
 
-Based on current literature, there is no standardised set of gestures used for human-robot interaction. 
-Hence, this projects aims to address this issue by compiling a set of communicative body and hand gestures, with the aim of creating a standardised list for future research in this space.
-The goal is to utilise this custom dataset to train a gesture recognition model to improve current and future research in human-robot interaction.
-More details abot the gestures can be found [here](#gestures).
+More details about the proposed gestures can be found [here](#gestures).
 
+This system was also used to communicate between a user and a Fetch robot. More details about this can be found [here](#).
 
-## Dependencies
-- ROS Melodic
-- [sense](https://github.com/TwentyBN/sense)
-- Python 3
+## Poster
 
+This repository was written for my ECSE Final Year Project.
+
+<p align='center'>
+    <img src='docs/poster.png' width='600px'>
+</p>
 
 ## Gestures
 
@@ -40,12 +41,23 @@ To leverage this gesture recognition model, we conducted a data collection study
 *(The full list of gestures can be found [here](https://youtube.com/playlist?list=PL-MdrmgE0ZdsBIVYdPruDXcg29n1nCLXA))*
 
 
+# hiROS
+
+This repository was constructed using ROS Melodic (Robot Operating System) framework and uses [sense](https://github.com/TwentyBN/sense) as the main backbone.
+
+## Dependencies
+- ROS Melodic
+- [sense](https://github.com/TwentyBN/sense)
+- Python 3
+
 ## Setup
+
+### Python3 for ROS Melodic
 
 Since this repository is built in Python3 and ROS Melodic uses Python2.7, you need to first build [opencv_vision](https://github.com/ros-perception/vision_opencv) in Python3 and extend your main workspace (i.e. catkin_ws).
 
-
 Once you have installed all the right dependancies for [opencv_vision](https://github.com/ros-perception/vision_opencv), you have to build your workspace. 
+
 More details can be found from this [site](https://medium.com/@beta_b0t/how-to-setup-ros-with-python-3-44a69ca36674) for reference.
 
 ```
@@ -54,14 +66,18 @@ $ cd ~/build_ws/src
 $ git clone -b melodic https://github.com/ros-perception/vision_opencv.git
 $ cd ~/build_ws
 $ catkin build cv_bridge
+```
 
-# Once you build it, you will need to extend it into your main working environment (in this example it is catkin_ws)
-# You will need to do this every time you rebuild your workspace
+Once you build it, you will need to extend it into your main working environment (in this example it is catkin_ws). You will need to do this every time you rebuild your workspace
+
+```
 $ cd ~/catkin_ws
 $ catkin_make
 $ source devel/setup.bash
 $ source ~/build_ws/devel/setup.bash --extend
 ```
+
+
 
 ## Usage
 
