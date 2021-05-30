@@ -82,6 +82,10 @@ $ source ~/build_ws/devel/setup.bash --extend
 
 Before you can use it, pleaes check out the gesture recognition system [here](https://github.com/alberttjc/sense).
 
+<p align='center'>
+    <img src='models/fyp5024.png' width='500px'>
+</p>
+
 
 
 ## Usage
