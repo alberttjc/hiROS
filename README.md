@@ -48,7 +48,7 @@ This repository was constructed using ROS Melodic (Robot Operating System) frame
 
 ## Dependencies
 - ROS Melodic
-- [sense](https://github.com/TwentyBN/sense)
+- [sense-for-HRI](https://github.com/alberttjc/sense-for-HRI)
 - Python 3
 
 ## Setup
@@ -80,11 +80,12 @@ $ source ~/build_ws/devel/setup.bash --extend
 
 ### **Gesture Recognition Model (Sense)**
 
-Before you can use it, pleaes check out the gesture recognition system [here](https://github.com/alberttjc/sense).
+Before you can use it, pleaes check out the gesture recognition system [here](https://github.com/alberttjc/sense-for-HRI).
 
-<p align='center'>
-    <img src='models/fyp5024.png' width='500px'>
+<p align="center">
+    <img src="docs/hri_recognition.gif" width="600px">
 </p>
+
 
 
 
