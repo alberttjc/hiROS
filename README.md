@@ -20,13 +20,14 @@ More details about the proposed gestures can be found [here](#gestures).
 
 This system was also used to communicate between a user and a Fetch robot. More details about this can be found [here](#).
 
-## Poster
+<!-- ## Poster
 
 This repository was written for my ECSE Final Year Project.
 
 <p align='center'>
-    <img src='docs/poster.png' width='600px'>
-</p>
+    <img src='docs/image/poster.png' width='600px'>
+</p> -->
+
 
 ## Gestures
 
@@ -35,11 +36,52 @@ To validate our model, we decided to use [sense](https://github.com/TwentyBN/sen
 To leverage this gesture recognition model, we conducted a data collection study to collect a more diversifed dataset to train a custom model.
 
 <p align="center">
-    <img src="docs/gesture_1.gif" width="400px">
-    <img src="docs/gesture_24.gif" width="400px">
+    <img src="docs/image/gesture_1.gif" width="400px">
+    <img src="docs/image/gesture_24.gif" width="400px">
 </p>
 
 *(The full list of gestures can be found [here](https://youtube.com/playlist?list=PL-MdrmgE0ZdsBIVYdPruDXcg29n1nCLXA))*
+
+
+## Data Analysis
+
+Amount of data: 190 participants
+
+Data collected from Stage 1 and Stage 2 was used to train a custom classifier. The training was done over 200 epochs, with the results shown below.
+
+### Training Model
+
+<p align="center">
+    <img src="docs/model/stage1_training.png" width="400px">
+    <img src="docs/model/stage2_training.png" width="400px">
+</p>
+
+### Confusion Matrix
+
+<p align="center">
+    <img src="docs/model/stage1_cfn.png" width="400px">
+    <img src="docs/model/stage2_cfn.png" width="400px">
+</p>
+
+### Model Comparison
+
+<p align="center">
+    <img src="docs/model/comparison.png" width="500px">
+</p>
+
+### Performance
+
+<center>
+
+&nbsp; | Accuracy | Precision | Recall |
+--- | --- | --- | --- |
+Stage 1 | 19.2% | 19.4% | 19.0% |
+Stage 2 | 90.2% | 91.7% | 90.9% |
+Model Comparison | 11.2% | 18.0% | 11.2% |
+
+</center>
+
+
 
 
 # hiROS
@@ -83,7 +125,7 @@ $ source ~/build_ws/devel/setup.bash --extend
 Before you can use it, pleaes check out the gesture recognition system [here](https://github.com/alberttjc/sense-for-HRI).
 
 <p align="center">
-    <img src="docs/hri_recognition.gif" width="600px">
+    <img src="docs/image/hri_recognition.gif" width="600px">
 </p>
 
 
