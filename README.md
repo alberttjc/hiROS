@@ -1,4 +1,4 @@
-# ECSE Final Year Project 2021
+# hiROS
 
 <!-- TABLE OF CONTENTS -->
 <p align="center">
@@ -14,11 +14,18 @@
 
 ## Introduction
 
-This repository integrates a gesture recognition system into the ROS framework to further facilitate human robot interaction research. Based on current literature, there is no standardised set of gestures used for human robot interaction. Hence, this projects aims to address this issue by compiling a set of communicative body and hand gestures, with the aim of creating a standardised list for future research in this space.
+We proposed a set of communicative gestures for Human Robot Interactin and an RGB Image-based Gesture Recognizer Implemented in ROS. The aim of this project is to facilitate a more intuitive Human-Robot Interaction (HRI) through gestures.
 
-More details about the proposed gestures can be found [here](#gestures).
+First, we propose a set of commands commonly used for human-robot interaction. Next, an online user study was conducted with a total of 190 participants. This was done to investigate if there was an agreed set of gestures that people intuitively used to communicate the given commands to robots when no guidance or training were given.
 
-This system was also used to communicate between a user and a Fetch robot. More details about this can be found [here](#).
+As we found large variations among the gestures exist between participants, we proposed a set of [gestures for the proposed commands](#gestures) to be used as a common foundation for the robot interaction. We collected ~7500 video demonstrations of the proposed gestures and trained a gesture recognition model, adapting a 3D Convoluytional Neural Netowrk (CNN) as the classifer, with a final accuracy of 84.1%. The model was capable of training successfull with a relatively small amount of training data.
+
+The model was then integrated into the ROS framework and report details for a demonstrated use case, where a person commands a robot to perform a pick and place task using the proposed set. This integrated ROS gesture recognition system is made available for use, and built with the intention to allow for new adaptions depending on robot model and use case scenarios, for novel user applications. For our demonstration, we used this system to communicate between a user and a Fetch robot as shown below.
+
+<p align="center">
+    <img src="docs/image/demonstration.png" width=600px>
+</p>
+
 
 <!-- ## Poster
 
@@ -31,64 +38,62 @@ This repository was written for my ECSE Final Year Project.
 
 ## Gestures
 
-After reviewing current literature, we have compiled a list of gestures to be used for this project.
-To validate our model, we decided to use [sense](https://github.com/TwentyBN/sense) as the main backbone of our project.
-To leverage this gesture recognition model, we conducted a data collection study to collect a more diversifed dataset to train a custom model.
+We have proposed a set of commands that may be commonly used for human-robot interaction, shown in the table below. To validate our model, we used [sense](https://github.com/quic/sense) (action recognition model) as the backbone of our system. To leverage this model, we conducted a data collection study to collect a more diversifed dataset to train a custom model. Two additional gesture of "doing nothing" and "doing something else" were also introduced. These two classes are used to identify when the user is idle or performing non-communicative gestures.
 
 <p align="center">
-    <img src="docs/image/gesture_1.gif" width="400px">
-    <img src="docs/image/gesture_24.gif" width="400px">
+    <img src="docs/image/gestures.png">
 </p>
-
-*(The full list of gestures can be found [here](https://youtube.com/playlist?list=PL-MdrmgE0ZdsBIVYdPruDXcg29n1nCLXA))*
-
-
-## Data Analysis
-
-Amount of data: 190 participants
-
-Data collected from Stage 1 and Stage 2 was used to train a custom classifier. The training was done over 200 epochs, with the results shown below.
-
-### Training Model
-
-<p align="center">
-    <img src="docs/model/stage1_training.png" width="400px">
-    <img src="docs/model/stage2_training.png" width="400px">
-</p>
-
-### Confusion Matrix
-
-<p align="center">
-    <img src="docs/model/stage1_cfn.png" width="400px">
-    <img src="docs/model/stage2_cfn.png" width="400px">
-</p>
-
-### Model Comparison
-
-<p align="center">
-    <img src="docs/model/comparison.png" width="500px">
-</p>
-
-### Performance
 
 <center>
 
-&nbsp; | Accuracy | Precision | Recall |
---- | --- | --- | --- |
-Stage 1 | 19.2% | 19.4% | 19.0% |
-Stage 2 | 90.2% | 91.7% | 90.9% |
-Model Comparison | 11.2% | 18.0% | 11.2% |
+| List of Proposed Commands | &nbsp; |&nbsp; |
+| :--------------- | :---------------          | :---------------       |
+| 1. Start         | 10. Point to an Object    | 18. Thumbs up          | 
+| 2. Stop          | 11. Point to an Area      | 19. Thumbs down        |
+| 3. Handwave      | 12. I will Follow You     | 20. Give me an item    |
+| 4. Resume        | 13. Follow Me             | 21. Receive an item    | 
+| 5. Pause         | 14. Watch Me              | 22. Move backwards     | 
+| 6. Agree         | 15. Watch Out             | 23. Come forward       | 
+| 7. Disagree      | 16. Speed up              | 24. Move to the left   |
+| 8. Repeat        | 17. Slow down             | 25. Move to the right  |
+| 9. Undo          | &nbsp;                    | &nbsp;                 | 
 
 </center>
 
+*(The full list of video demonstration for each gesture can be found [here](https://youtube.com/playlist?list=PL-MdrmgE0ZdsBIVYdPruDXcg29n1nCLXA))*
 
 
+## Gesture Recognition Model
 
-# hiROS
+Total number of participants: ~190
+
+Stage 1: Participants were asked how they would gesture to a robot to best convey a given command (i.e. "How would gesture to tell a robot to stop in place?')
+
+Stage 2: Participants were shown a video demonstration of how to gesture each command, and then asked to perform each demonstrated gesture after viewing the video example.
+
+Data collected from each respective stage were trained using the [sense](https://github.com/quic/sense) action recognition model. The model accuracy and confusion matrix is shown below. The model was trained for 100 epochs, with the performance converging after the 80th epoch. The model accuracy was also validated using multi-fold cross validation, with k=5.
+
+<center>
+
+Average number of videos per gesture | Stage 1 Accuracy | Stage 2 Accuracy  |
+:---:   | :---:         | :---:         |
+~50     | 17.2 ± 3.3%   | 81.0 ± 1.3%   |
+~100    | 19.7 ± 2.6%   | 79.2 ± 2.1%   |
+~150    | 21.6 ± 2.2%   | 82.0 ± 1.9%   |
+
+
+</center>
+
+<p align="center">
+    <img src="docs/model/cfn_stage1.png" width="400px">
+    <img src="docs/model/cfn_stage2.png" width="400px">
+</p>
+
+
+## Dependencies
 
 This repository was constructed using ROS Melodic (Robot Operating System) framework and uses [sense](https://github.com/TwentyBN/sense) as the main backbone.
 
-## Dependencies
 - ROS Melodic
 - [sense-for-HRI](https://github.com/alberttjc/sense-for-HRI)
 - Python 3
