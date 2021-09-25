@@ -184,3 +184,21 @@ $ roslaunch hiros_smach robot.launch
 $ rosrun hiros_smach main.py
 ```
 
+## Citation
+
+Please cite these papers in your publicaiton if this repository helps your research.
+
+```
+@misc{tan2021proposed,
+      title={A Proposed Set of Communicative Gestures for Human Robot Interaction and an RGB Image-based Gesture Recognizer Implemented in ROS}, 
+      author={Jia Chuan A. Tan and Wesley P. Chan and Nicole L. Robinson and Elizabeth A. Croft and Dana Kulic},
+      year={2021},
+      eprint={2109.09908},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO}
+}
+```
+
+Paper links: 
+
+- [A Proposed Set of Communicative Gestures for Human Robot Interaction and an RGB Image-based Gesture Recognizer Implementd in ROS](https://arxiv.org/abs/2109.09908)
